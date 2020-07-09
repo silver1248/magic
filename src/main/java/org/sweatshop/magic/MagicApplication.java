@@ -5,21 +5,24 @@ import org.sweatshop.resources.MagicResources;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.vavr.jackson.datatype.VavrModule;
+import lombok.Generated;
 
 public class MagicApplication extends Application<MagicConfiguration> {
 
+    @Generated
     public static void main(String[] args) throws Exception {
         new MagicApplication().run(args);
     }
 
     @Override
     public String getName() {
-        return "hello-world";
+        return "magic";
     }
 
     @Override
     public void initialize(Bootstrap<MagicConfiguration> bootstrap) {
-        // nothing to do yet
+        bootstrap.getObjectMapper().registerModule(new VavrModule());
     }
 
     @Override
