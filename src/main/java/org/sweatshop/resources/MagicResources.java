@@ -27,7 +27,23 @@ public class MagicResources {
     @GET
     @Timed
     public List<String> peopleNames() {
-        return cards;
+        return people;
+    }
+
+    @javax.ws.rs.Path("card-names/{card}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PUT
+    @Timed
+    public List<String> addPerson(@PathParam("card") String name) {
+        return people.append(name);
+    }
+
+    @javax.ws.rs.Path("card-names/{card}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @DELETE
+    @Timed
+    public List<String> removePerson(@PathParam("card") String name) {
+        return people.remove(name);
     }
 
     @javax.ws.rs.Path("card-names")
