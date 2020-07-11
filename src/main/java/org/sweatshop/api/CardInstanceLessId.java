@@ -1,23 +1,25 @@
 package org.sweatshop.api;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Value;
 
 @Value
-public class CardInstances {
+public class CardInstanceLessId {
     String name;
     int condition;
-    int id;
 
     @JsonCreator
-    public CardInstances(
+    public CardInstanceLessId(
             @JsonProperty("name") String name, 
-            @JsonProperty("condition") int condition,
-            @JsonProperty("id") int id)
+            @JsonProperty("condition") int condition)
     {
         this.name = name;
         this.condition = condition;
-        this.id = id;
+    }
+
+    public CardInstance createCardInstance(int id) {
+        return new CardInstance(name, condition, id);
     }
 }

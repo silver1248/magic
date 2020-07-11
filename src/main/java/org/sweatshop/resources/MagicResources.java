@@ -2,7 +2,12 @@ package org.sweatshop.resources;
 
 import com.codahale.metrics.annotation.Timed;
 
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
+import io.vavr.collection.Map;
+import io.vavr.collection.Set;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
@@ -14,15 +19,23 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.sweatshop.api.CardInstance;
+import org.sweatshop.api.CardInstanceLessId;
 import org.sweatshop.api.CardName;
 
 @Value
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 public class MagicResources {
-    List<String> people = List.of("Xavier", "Sarah", "George", "Zoe");
-    @NonFinal static List<CardName> cardNames = List.of(new CardName("Lightning-Bolt", "Red", "Instant"), new CardName("Lava-Spike", "Red", "Sorcery")
-            , new CardName("Price-of-Progress", "Red", "Instant"), new CardName("Vexing-Devil", "Red", "Creature"));
+    @NonFinal static List<String> people = List.of("Xavier", "Sarah", "George", "Zoe");
+    @NonFinal static Map<String, CardName> cardNames = HashMap.ofEntries(
+            createMapTuple("Lightning-Bolt", "Red", "Instant"), createMapTuple("Lava-Spike", "Red", "Sorcery")
+            , createMapTuple("Price-of-Progress", "Red", "Instant"), createMapTuple("Vexing-Devil", "Red", "Creature"));
+    @NonFinal static Map<Integer, CardInstance> cardInstances = HashMap.empty();
+
+    public static Tuple2<String, CardName> createMapTuple(String name, String color, String type) {
+        return Tuple.of(name, new CardName(name, color, type));
+    }
 
     @javax.ws.rs.Path("people")
     @Produces(MediaType.APPLICATION_JSON)
@@ -52,46 +65,52 @@ public class MagicResources {
     @Produces(MediaType.APPLICATION_JSON)
     @GET
     @Timed
-    public List<CardName> cardNames() {
-        return cardNames;
+    public Set<String> getCardNames() {
+        return cardNames.keySet();
     }
 
     @javax.ws.rs.Path("card-names/{card}")
     @Produces(MediaType.APPLICATION_JSON)
     @PUT
     @Timed
-    public List<CardName> addCardName(@PathParam("card") String name) {
-//        return cardNames.append(name);
-        return null;
+    public Set<String> addCardName(@PathParam("card") String name, CardName cardName) {
+        cardNames = cardNames.put(name, cardName);
+        return getCardNames();
     }
 
     @javax.ws.rs.Path("card-names/{card}")
     @Produces(MediaType.APPLICATION_JSON)
     @DELETE
     @Timed
-    public List<CardName> removeCardName(@PathParam("card") String name) {
-        for (int i = 0; i < cardNames.length() - 1; i++) {
-            if (cardNames.get(i).getName() == name) {
-                cardNames = cardNames.remove(cardNames.get(i));
-                break;
-            }
-        }
-        return cardNames;
+    public Set<String> removeCardName(@PathParam("card") String name) {
+        cardNames = cardNames.remove(name);
+        return getCardNames();
+    }
+
+    @javax.ws.rs.Path("card-names/")
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    @Timed
+    public Set<Integer> getCardInstance() {
+        return cardInstances.keySet();
     }
 
     @javax.ws.rs.Path("card-names/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @GET
     @Timed
-    public List<CardName> cardInstances(@PathParam("id") int id) {
-        return cardNames;
+    public CardInstance getCardInstance(@PathParam("id") int id) {
+        return cardInstances.get(id).get();
     }
 
     @javax.ws.rs.Path("card-names/")
     @Produces(MediaType.APPLICATION_JSON)
     @PUT
     @Timed
-    public List<CardName> addCardInstance(CardName cardName) {
-        return cardNames.append(cardName);
+    public CardInstance addCardInstance(CardInstanceLessId cardInstanceLessId) {
+        int nextVal = cardInstances.keySet().max().getOrElse(-1) + 1;
+        CardInstance cardInstance = cardInstanceLessId.createCardInstance(nextVal);
+        cardInstances = cardInstances.put(nextVal, cardInstance);
+        return cardInstance;
     }
 }
