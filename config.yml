@@ -2,5 +2,3 @@ logging:
   level: INFO
   loggers:
     org.sweatshop: DEBUG
-template: Hello, %s!
-defaultName: Stranger

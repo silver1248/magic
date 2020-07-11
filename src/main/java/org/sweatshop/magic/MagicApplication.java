@@ -27,12 +27,8 @@ public class MagicApplication extends Application<MagicConfiguration> {
 
     @Override
     public void run(MagicConfiguration configuration,
-                    Environment environment) {
-        final MagicResources resource = new MagicResources(
-            configuration.getTemplate(),
-            configuration.getDefaultName()
-        );
+            Environment environment) {
+        final MagicResources resource = new MagicResources();
         environment.jersey().register(resource);
     }
-
 }

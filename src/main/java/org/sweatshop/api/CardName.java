@@ -1,9 +1,7 @@
-import org.sweatshop.resources.MagicResources;
-
+package org.sweatshop.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.vavr.collection.List;
 import lombok.Value;
 
 @Value
@@ -22,5 +20,4 @@ public class CardName {
         this.color = color;
         this.type = type;
     }
-
 }
