@@ -5,6 +5,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
@@ -29,11 +30,13 @@ import org.sweatshop.api.CardName;
 public class MagicResources {
     @NonFinal static List<String> people = List.of("Xavier", "Sarah", "George", "Zoe");
     @NonFinal static Map<String, CardName> cardNames = HashMap.ofEntries(
-            createMapTuple("Lightning-Bolt", "Red", "Instant"), createMapTuple("Lava-Spike", "Red", "Sorcery")
-            , createMapTuple("Price-of-Progress", "Red", "Instant"), createMapTuple("Vexing-Devil", "Red", "Creature"));
+            createMapTuple("Lightning-Bolt", "Red", HashSet.of("Instant"))
+            , createMapTuple("Lava-Spike", "Red", HashSet.of("Sorcery"))
+            , createMapTuple("Price-of-Progress", "Red", HashSet.of("Instant"))
+            , createMapTuple("Vexing-Devil", "Red", HashSet.of("Creature")));
     @NonFinal static Map<Integer, CardInstance> cardInstances = HashMap.empty();
 
-    public static Tuple2<String, CardName> createMapTuple(String name, String color, String type) {
+    public static Tuple2<String, CardName> createMapTuple(String name, String color, Set<String> type) {
         return Tuple.of(name, new CardName(name, color, type));
     }
 
