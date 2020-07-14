@@ -14,11 +14,13 @@ import lombok.experimental.NonFinal;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.sweatshop.api.CardInstance;
 import org.sweatshop.api.CardInstanceLessId;
@@ -64,7 +66,7 @@ public class MagicResources {
         return people.remove(person);
     }
 
-    @javax.ws.rs.Path("card-names")
+    @javax.ws.rs.Path("card-names/")
     @Produces(MediaType.APPLICATION_JSON)
     @GET
     @Timed
@@ -74,10 +76,21 @@ public class MagicResources {
 
     @javax.ws.rs.Path("card-names/{card}")
     @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    @Timed
+    public List<Tuple2<String,CardName>> getCardName(@PathParam("card") String name) {
+        List<Tuple2<String,CardName>> allCardsWithName = cardNames.filter(x -> x._2().getName().equals(name)).toList();
+        return allCardsWithName;
+    }
+
+    @javax.ws.rs.Path("card-names/{card}")
+    @Produces(MediaType.APPLICATION_JSON)
     @PUT
     @Timed
     public Set<String> addCardName(@PathParam("card") String name, CardName cardName) {
-        cardNames = cardNames.put(name, cardName);
+        if (null != cardName) {
+            cardNames = cardNames.put(name, cardName);
+        }
         return getCardNames();
     }
 
@@ -90,15 +103,15 @@ public class MagicResources {
         return getCardNames();
     }
 
-    @javax.ws.rs.Path("card-names/")
+    @javax.ws.rs.Path("cardinstances/")
     @Produces(MediaType.APPLICATION_JSON)
     @GET
     @Timed
-    public Set<Integer> getCardInstance() {
+    public Set<Integer> getCardInstances() {
         return cardInstances.keySet();
     }
 
-    @javax.ws.rs.Path("card-names/{id}")
+    @javax.ws.rs.Path("cardinstances/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @GET
     @Timed
@@ -106,9 +119,9 @@ public class MagicResources {
         return cardInstances.get(id).get();
     }
 
-    @javax.ws.rs.Path("card-names/")
+    @javax.ws.rs.Path("cardinstances/new")
     @Produces(MediaType.APPLICATION_JSON)
-    @PUT
+    @POST
     @Timed
     public CardInstance addCardInstance(CardInstanceLessId cardInstanceLessId) {
         int nextVal = cardInstances.keySet().max().getOrElse(-1) + 1;
