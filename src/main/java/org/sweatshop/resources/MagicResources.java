@@ -12,6 +12,8 @@ import io.vavr.collection.Set;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
+import java.net.URI;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -123,10 +125,10 @@ public class MagicResources {
     @Produces(MediaType.APPLICATION_JSON)
     @POST
     @Timed
-    public CardInstance addCardInstance(CardInstanceLessId cardInstanceLessId) {
+    public Response addCardInstance(CardInstanceLessId cardInstanceLessId) {
         int nextVal = cardInstances.keySet().max().getOrElse(-1) + 1;
         CardInstance cardInstance = cardInstanceLessId.createCardInstance(nextVal);
         cardInstances = cardInstances.put(nextVal, cardInstance);
-        return cardInstance;
+        return Response.created(URI.create("cardinstances/" + nextVal)).build();
     }
 }
