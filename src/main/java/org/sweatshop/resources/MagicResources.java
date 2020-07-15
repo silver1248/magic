@@ -121,14 +121,19 @@ public class MagicResources {
         return cardInstances.get(id).get();
     }
 
+
     @javax.ws.rs.Path("cardinstances/new")
     @Produces(MediaType.APPLICATION_JSON)
     @POST
     @Timed
     public Response addCardInstance(CardInstanceLessId cardInstanceLessId) {
-        int nextVal = cardInstances.keySet().max().getOrElse(-1) + 1;
-        CardInstance cardInstance = cardInstanceLessId.createCardInstance(nextVal);
-        cardInstances = cardInstances.put(nextVal, cardInstance);
-        return Response.created(URI.create("cardinstances/" + nextVal)).build();
+        if (cardNames.keySet().contains(cardInstanceLessId.getName())) {
+            int nextVal = cardInstances.keySet().max().getOrElse(-1) + 1;
+            CardInstance cardInstance = cardInstanceLessId.createCardInstance(nextVal);
+            cardInstances = cardInstances.put(nextVal, cardInstance);
+            return Response.created(URI.create("cardinstances/" + nextVal)).build();
+        } else {
+            return Response.status(400).entity("You put in a name that does not belong to any existing CardName").build();
+        }
     }
 }
