@@ -3,7 +3,7 @@ package org.sweatshop.api;
 import io.vavr.collection.Set;
 
 public enum CardType {
-    ARTIFACT, CREATURE, ENCHANTMENT, INSTANT, SORCERY;
+    ARTIFACT, CREATURE, ENCHANTMENT, INSTANT, SORCERY, PLANESWALKER, LAND;
 
     public static CardType of(String type) {
         return CardType.valueOf(type.toUpperCase());
