@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import org.sweatshop.api.CardInstance;
 import org.sweatshop.api.CardInstanceLessId;
 import org.sweatshop.api.CardName;
+import org.sweatshop.api.EndpointException;
 
 @Value
 @Path("/")
@@ -85,15 +86,19 @@ public class MagicResources {
         return allCardsWithName;
     }
 
+
+
     @javax.ws.rs.Path("card-names/{card}")
     @Produces(MediaType.APPLICATION_JSON)
     @PUT
     @Timed
-    public Set<String> addCardName(@PathParam("card") String name, CardName cardName) {
+    public Response addCardName(@PathParam("card") String name, CardName cardName) {
         if (null != cardName) {
-            cardNames = cardNames.put(name, cardName);
+            if (null != cardName.getColor()) {
+                cardNames = cardNames.put(name, cardName);
+            }
         }
-        return getCardNames();
+        return Response.created(URI.create("card-name/")).build();
     }
 
     @javax.ws.rs.Path("card-names/{card}")
@@ -126,14 +131,18 @@ public class MagicResources {
     @Produces(MediaType.APPLICATION_JSON)
     @POST
     @Timed
-    public Response addCardInstance(CardInstanceLessId cardInstanceLessId) {
+    public Response addCardInstance(CardInstanceLessId cardInstanceLessId) throws EndpointException {
         if (cardNames.keySet().contains(cardInstanceLessId.getName())) {
             int nextVal = cardInstances.keySet().max().getOrElse(-1) + 1;
             CardInstance cardInstance = cardInstanceLessId.createCardInstance(nextVal);
             cardInstances = cardInstances.put(nextVal, cardInstance);
             return Response.created(URI.create("cardinstances/" + nextVal)).build();
         } else {
-            return Response.status(400).entity("You put in a name that does not belong to any existing CardName").build();
+            throw new EndpointException(400, URI.create("/no-name")
+                    , "There is no card name of the name you provided"
+                    , "You asked for an instance of card name "+cardInstanceLessId.getName()+" but the available names are "+cardNames.keySet()
+                    , HashMap.of("requested-card-name", cardInstanceLessId.getName(),
+                                 "available-card-names", cardNames.keySet()));
         }
     }
 }

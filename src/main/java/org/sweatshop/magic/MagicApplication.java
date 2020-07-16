@@ -1,5 +1,6 @@
 package org.sweatshop.magic;
 
+import org.sweatshop.jersey.EndpointExceptionMapper;
 import org.sweatshop.resources.MagicResources;
 
 import io.dropwizard.Application;
@@ -30,5 +31,6 @@ public class MagicApplication extends Application<MagicConfiguration> {
             Environment environment) {
         final MagicResources resource = new MagicResources();
         environment.jersey().register(resource);
+        environment.jersey().register(new EndpointExceptionMapper());
     }
 }
