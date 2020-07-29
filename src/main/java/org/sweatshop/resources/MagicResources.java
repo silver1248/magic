@@ -1,17 +1,5 @@
 package org.sweatshop.resources;
 
-import com.codahale.metrics.annotation.Timed;
-
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
-import io.vavr.collection.HashMap;
-import io.vavr.collection.HashSet;
-import io.vavr.collection.List;
-import io.vavr.collection.Map;
-import io.vavr.collection.Set;
-import lombok.Value;
-import lombok.experimental.NonFinal;
-
 import java.net.URI;
 
 import javax.ws.rs.DELETE;
@@ -29,17 +17,24 @@ import org.sweatshop.api.CardInstanceLessId;
 import org.sweatshop.api.CardName;
 import org.sweatshop.api.EndpointException;
 
+import com.codahale.metrics.annotation.Timed;
+
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.List;
+import io.vavr.collection.Map;
+import io.vavr.collection.Set;
+import lombok.Value;
+import lombok.experimental.NonFinal;
+
 @Value
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 public class MagicResources {
-    @NonFinal static List<String> people = List.of("Xavier", "Sarah", "George", "Zoe");
-    @NonFinal static Map<String, CardName> cardNames = HashMap.ofEntries(
-            createMapTuple("Lightning-Bolt", "Red", HashSet.of("Instant"))
-            , createMapTuple("Lava-Spike", "Red", HashSet.of("Sorcery"))
-            , createMapTuple("Price-of-Progress", "Red", HashSet.of("Instant"))
-            , createMapTuple("Vexing-Devil", "Red", HashSet.of("Creature")));
-    @NonFinal static Map<Integer, CardInstance> cardInstances = HashMap.empty();
+    @NonFinal List<String> people;
+    @NonFinal Map<String, CardName> cardNames;
+    @NonFinal Map<Integer, CardInstance> cardInstances;
 
     public static Tuple2<String, CardName> createMapTuple(String name, String color, Set<String> type) {
         return Tuple.of(name, new CardName(name, color, type));
@@ -58,7 +53,7 @@ public class MagicResources {
     @PUT
     @Timed
     public List<String> addPerson(@PathParam("person") String person) {
-        return people.append(person);
+            return people.append(person);
     }
 
     @javax.ws.rs.Path("people/{person}")
@@ -77,6 +72,14 @@ public class MagicResources {
         return cardNames.keySet();
     }
 
+    @javax.ws.rs.Path("card-names/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    @Timed
+    public Set<Tuple2<String, CardName>> getCards() {
+        return cardNames.toSet();
+    }
+
     @javax.ws.rs.Path("card-names/{card}")
     @Produces(MediaType.APPLICATION_JSON)
     @GET
@@ -86,18 +89,12 @@ public class MagicResources {
         return allCardsWithName;
     }
 
-
-
     @javax.ws.rs.Path("card-names/{card}")
     @Produces(MediaType.APPLICATION_JSON)
     @PUT
     @Timed
     public Response addCardName(@PathParam("card") String name, CardName cardName) {
-        if (null != cardName) {
-            if (null != cardName.getColor()) {
-                cardNames = cardNames.put(name, cardName);
-            }
-        }
+        cardNames = cardNames.put(name, cardName);
         return Response.created(URI.create("card-name/")).build();
     }
 
@@ -116,6 +113,14 @@ public class MagicResources {
     @Timed
     public Set<Integer> getCardInstances() {
         return cardInstances.keySet();
+    }
+
+    @javax.ws.rs.Path("cardinstances/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    @Timed
+    public Set<Tuple2<Integer, CardInstance>> getInstances() {
+        return cardInstances.toSet();
     }
 
     @javax.ws.rs.Path("cardinstances/{id}")
@@ -142,7 +147,7 @@ public class MagicResources {
                     , "There is no card name of the name you provided"
                     , "You asked for an instance of card name "+cardInstanceLessId.getName()+" but the available names are "+cardNames.keySet()
                     , HashMap.of("requested-card-name", cardInstanceLessId.getName(),
-                                 "available-card-names", cardNames.keySet()));
+                            "available-card-names", cardNames.keySet()));
         }
     }
 }

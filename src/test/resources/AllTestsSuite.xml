@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="unit tests" verbose="1">
+
+    <test name="testAll">
+        <groups>
+            <run/>
+        </groups>
+        <packages>
+            <package name="org.sweatshop.*"/>
+        </packages>
+    </test>
+
+</suite>
